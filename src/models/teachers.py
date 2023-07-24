@@ -15,5 +15,6 @@ class Teachers(Base):
     def to_read_model(self) -> TeacherSchema:
         return TeacherSchema(
             id=self.id,
+            school_id=self.school_id,
             name=self.name,
         )

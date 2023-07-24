@@ -10,6 +10,9 @@ from src.services.schools import SchoolsService
 from src.repositories.groups import GroupsRepository
 from src.services.groups import GroupsService
 
+from src.repositories.teachers import TeachersRepository
+from src.services.teachers import TeachersService
+
 
 def schedules_service():
     return SchedulesService(SchedulesRepository)
@@ -22,3 +25,6 @@ def schools_service():
 
 def groups_service():
     return GroupsService(GroupsRepository)
+
+def teachers_service():
+    return TeachersService(TeachersRepository)
