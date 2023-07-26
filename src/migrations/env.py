@@ -22,6 +22,7 @@ from models.schedules import Schedules
 from models.schools import Schools
 from models.subjects import Subjects 
 from models.teachers import Teachers 
+from models.admins import Admins
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
