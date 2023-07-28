@@ -189,3 +189,22 @@ async def register_teacher(
         school_id = admin.school_id
     teacher_id = await teachers_service.create_teacher(teacher_name, school_id)
     return teacher_id
+
+@router.post("/register/schedule")
+async def register_schedule(
+    schedule_service: Annotated[SchedulesService, Depends(schedules_service)],
+    admin: Annotated[AdminSchema, Depends(get_current_admin)],
+    day_id: int, 
+    period_id: int, 
+    subject_id: int, 
+    classroom_id: int, 
+    teacher_id: int, 
+    group_id: int,
+    school_id: Optional[int] = None, 
+    ):
+    if admin.permission != 1:
+        school_id = admin.school_id
+    schedule_id = await schedule_service.create_schedule(
+        school_id, day_id, period_id, subject_id, classroom_id, teacher_id, group_id,
+    )
+    return schedule_id
