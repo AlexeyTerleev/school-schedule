@@ -1,5 +1,6 @@
 from src.utils.repository import AbstractRepository
 from src.utils.admins import get_hashed_password
+from src.schemas.admins import AdminRegisterSchema
 
 
 class AdminsService:
@@ -10,13 +11,13 @@ class AdminsService:
         admin = await self.admins_repo.find_one({"login": login})
         return admin
     
-    async def create_admin(self, login: str, password: str, permission: int, school_id: int):
+    async def create_admin(self, new_admin: AdminRegisterSchema):
         admin = await self.admins_repo.create_one(
             {
-                "login": login, 
-                "hashed_password": get_hashed_password(password),
-                "permission": permission,
-                "school_id": school_id,
+                "login": new_admin.login, 
+                "hashed_password": get_hashed_password(new_admin.password),
+                "permission": new_admin.permission,
+                "school_id": new_admin.school_id,
             }
         )
         return admin

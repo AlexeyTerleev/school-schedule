@@ -7,7 +7,7 @@ class AdminSchema(BaseModel):
     login: str
     password: str
     permission: int
-    school_id: Optional[int] = None
+    school_id: Optional[int]
     
     class Config:
         from_attributes = True
@@ -20,12 +20,23 @@ class AdminAuthSchema(BaseModel):
     class Config:
         from_attributes = True
 
+
 class AdminOutSchema(BaseModel):
     id: int
     login: str
     hashed_password: str
     permission: int
     school_id: Optional[int] = None
+    
+    class Config:
+        from_attributes = True
+
+
+class AdminRegisterSchema(BaseModel):
+    login: str
+    password: str
+    permission: int
+    school_id: Optional[int]
     
     class Config:
         from_attributes = True

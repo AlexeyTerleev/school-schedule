@@ -1,4 +1,5 @@
 from src.utils.repository import AbstractRepository
+from src.schemas.groups import GroupRegisterSchema
 
 
 class GroupsService:
@@ -9,9 +10,7 @@ class GroupsService:
         groups = await self.groups_repo.find_all({"school_id": school_id})
         return groups
 
-    async def create_group(self, group_name: str, school_id: int):
-        group_id = await self.groups_repo.create_one(
-            {"name": group_name, "school_id": school_id}
-        )
+    async def create_group(self, group: GroupRegisterSchema):
+        group_id = await self.groups_repo.create_one(dict(group))
         return group_id
 

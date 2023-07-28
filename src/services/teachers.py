@@ -1,4 +1,5 @@
 from src.utils.repository import AbstractRepository
+from src.schemas.teachers import TeacherRegisterSchema
 
 
 class TeachersService:
@@ -9,8 +10,6 @@ class TeachersService:
         teachers = await self.teachers_repo.find_all({"school_id": school_id})
         return teachers
     
-    async def create_teacher(self, teacher_name: str, school_id: int):
-        teacher_id = await self.teachers_repo.create_one(
-            {"name": teacher_name, "school_id": school_id}
-        )
+    async def create_teacher(self, teacher: TeacherRegisterSchema):
+        teacher_id = await self.teachers_repo.create_one(dict(teacher))
         return teacher_id

@@ -1,9 +1,10 @@
-from typing import Annotated
+from typing import Annotated, List
 
 from fastapi import APIRouter, Depends
 
 from src.api.dependencies import schedules_service
 from src.services.schedules import SchedulesService
+from src.schemas.schedules import ScheduleSchema
 
 router = APIRouter(
     prefix="/schedules",
@@ -11,7 +12,7 @@ router = APIRouter(
 )
 
 
-@router.get("/group")
+@router.get("/group", response_model=List[ScheduleSchema])
 async def get_schedules_group(
     group_id: int,
     schedules_service: Annotated[SchedulesService, Depends(schedules_service)],
@@ -19,7 +20,7 @@ async def get_schedules_group(
     schedules = await schedules_service.get_schedules_group(group_id)
     return schedules
 
-@router.get("/teacher")
+@router.get("/teacher", response_model=List[ScheduleSchema])
 async def get_schedules_teacher(
     teacher_id: int,
     schedules_service: Annotated[SchedulesService, Depends(schedules_service)],

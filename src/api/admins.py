@@ -6,19 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from starlette import status    
 
-from src.api.dependencies import (
-    admins_service, 
-    cities_service, 
-    classrooms_service,
-    groups_service,
-    periods_service,
-    schedules_service,
-    schools_service, 
-    subjects_service,
-    teachers_service,
-    get_current_admin,
-)
-
+from src.api.dependencies import *
 from src.services.admins import AdminsService
 from src.services.cities import CitiesService
 from src.services.classrooms import ClassroomsService
@@ -29,7 +17,15 @@ from src.services.schools import SchoolsService
 from src.services.subjects import SubjectsService
 from src.services.teachers import TeachersService
 
-from src.schemas.admins import TokenSchema, AdminSchema
+from src.schemas.admins import TokenSchema, AdminSchema, AdminRegisterSchema
+from src.schemas.cities import CityRegisterSchema
+from src.schemas.classrooms import ClassroomRegisterSchema
+from src.schemas.groups import GroupRegisterSchema
+from src.schemas.periods import PeriodRegisterSchema
+from src.schemas.schedules import ScheduleRegisterSchema
+from src.schemas.schools import SchoolRegisterSchema
+from src.schemas.subjects import SubjectRegisterSchema
+from src.schemas.teachers import TeacherRegisterSchema
 
 from src.utils.admins import verify_password, create_access_token, create_refresh_token, get_hashed_password
 
@@ -64,10 +60,7 @@ async def login(
 
 @router.post("/register/admin")
 async def create_admin(
-    login: str,
-    password: str,
-    permission: int,
-    school_id: Optional[int],
+    new_admin: AdminRegisterSchema,
     admins_service: Annotated[AdminsService, Depends(admins_service)],
     admin: Annotated[AdminSchema, Depends(get_current_admin)],
     ):
@@ -76,14 +69,14 @@ async def create_admin(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Permission denied"
         )
-    if permission != 1 and school_id is None:
+    if new_admin.permission != 1 and new_admin.school_id is None:
         raise ValueError
-    admin_id = await admins_service.create_admin(login, password, permission, school_id)
+    admin_id = await admins_service.create_admin(new_admin)
     return admin_id
 
 @router.post("/register/city")
 async def register_city(
-    city_name: str,
+    city: CityRegisterSchema,
     cities_service: Annotated[CitiesService, Depends(cities_service)],
     admin: Annotated[AdminSchema, Depends(get_current_admin)],
     ):
@@ -92,13 +85,12 @@ async def register_city(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Permission denied"
         )
-    city_id = await cities_service.create_city(city_name)
+    city_id = await cities_service.create_city(city)
     return city_id
 
 @router.post("/register/school")
 async def register_school(
-    school_name: str,
-    city_id: int,
+    school: SchoolRegisterSchema,
     schools_service: Annotated[SchoolsService, Depends(schools_service)],
     admin: Annotated[AdminSchema, Depends(get_current_admin)],
     ):
@@ -107,12 +99,12 @@ async def register_school(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Permission denied"
         )   
-    school_id = await schools_service.create_school(school_name, city_id)
+    school_id = await schools_service.create_school(school)
     return school_id
 
 @router.post("/register/subject")
 async def register_subject(
-    subject_name: str,
+    subject: SubjectRegisterSchema,
     subjects_service: Annotated[SubjectsService, Depends(subjects_service)],
     admin: Annotated[AdminSchema, Depends(get_current_admin)],
     ):
@@ -121,13 +113,12 @@ async def register_subject(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Permission denied"
         )   
-    subject_id = await subjects_service.create_subject(subject_name)
+    subject_id = await subjects_service.create_subject(subject)
     return subject_id
 
 @router.post("/register/period")
 async def register_period(
-    start_time_str: str,
-    end_time_str: str,
+    period: PeriodRegisterSchema,
     periods_service: Annotated[PeriodsService, Depends(periods_service)],
     admin: Annotated[AdminSchema, Depends(get_current_admin)],
     ):
@@ -135,76 +126,50 @@ async def register_period(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Permission denied"
-        )   
-    
-    if not re.match(r"^\d\d\:\d\d$", start_time_str):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Validation error: {start_time_str}"
-        )  
-    if not re.match(r"^\d\d\:\d\d$", end_time_str):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Validation error: {end_time_str}"
-        ) 
-    
-    start_time_obj = datetime.strptime(start_time_str, "%H:%M").time()
-    end_time_obj = datetime.strptime(end_time_str, "%H:%M").time()
-
-    period_id = await periods_service.create_period(start_time_obj, end_time_obj)
+        )       
+    period_id = await periods_service.create_period(period)
     return period_id
 
 @router.post("/register/classroom")
 async def register_classroom(
+    classroom: ClassroomRegisterSchema,
     classrooms_service: Annotated[ClassroomsService, Depends(classrooms_service)],
     admin: Annotated[AdminSchema, Depends(get_current_admin)],
-    classroom_name: str,
-    school_id: Optional[int] = None,
     ):
     if admin.permission != 1:
-        school_id = admin.school_id
-    classroom_id = await classrooms_service.create_classroom(classroom_name, school_id)
+        classroom.school_id = admin.school_id
+    classroom_id = await classrooms_service.create_classroom(classroom)
     return classroom_id
 
 @router.post("/register/group")
 async def register_group(
+    group: GroupRegisterSchema,
     groups_service: Annotated[GroupsService, Depends(groups_service)],
     admin: Annotated[AdminSchema, Depends(get_current_admin)],
-    group_name: str,
-    school_id: Optional[int] = None,
     ):
     if admin.permission != 1:
-        school_id = admin.school_id
-    group_id = await groups_service.create_group(group_name, school_id)
+        group.school_id = admin.school_id
+    group_id = await groups_service.create_group(group)
     return group_id
 
 @router.post("/register/teacher")
 async def register_teacher(
+    teacher: TeacherRegisterSchema,
     teachers_service: Annotated[TeachersService, Depends(teachers_service)],
     admin: Annotated[AdminSchema, Depends(get_current_admin)],
-    teacher_name: str,
-    school_id: Optional[int] = None,
     ):
     if admin.permission != 1:
-        school_id = admin.school_id
-    teacher_id = await teachers_service.create_teacher(teacher_name, school_id)
+        teacher.school_id = admin.school_id
+    teacher_id = await teachers_service.create_teacher(teacher)
     return teacher_id
 
 @router.post("/register/schedule")
 async def register_schedule(
+    schedule: ScheduleRegisterSchema,
     schedule_service: Annotated[SchedulesService, Depends(schedules_service)],
     admin: Annotated[AdminSchema, Depends(get_current_admin)],
-    day_id: int, 
-    period_id: int, 
-    subject_id: int, 
-    classroom_id: int, 
-    teacher_id: int, 
-    group_id: int,
-    school_id: Optional[int] = None, 
     ):
     if admin.permission != 1:
-        school_id = admin.school_id
-    schedule_id = await schedule_service.create_schedule(
-        school_id, day_id, period_id, subject_id, classroom_id, teacher_id, group_id,
-    )
-    return schedule_id
+        schedule.school_id = admin.school_id
+    schedule_id = await schedule_service.create_schedule(schedule)
+    return schedule_id  

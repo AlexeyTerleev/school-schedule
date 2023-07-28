@@ -1,4 +1,5 @@
 from src.utils.repository import AbstractRepository
+from src.schemas.schedules import ScheduleRegisterSchema
 
 
 class SchedulesService:
@@ -13,20 +14,6 @@ class SchedulesService:
         schedules = await self.schedules_repo.find_all({"teacher_id": teacher_id})
         return schedules
 
-    async def create_schedule(
-            self, school_id: int, day_id: int, 
-            period_id: int, subject_id: int, 
-            classroom_id: int, teacher_id: int, group_id: int
-        ):
-        schedule_id = await self.schedules_repo.create_one(
-            {
-                "school_id": school_id, 
-                "day_id": day_id,
-                "period_id": period_id,
-                "subject_id": subject_id,
-                "classroom_id": classroom_id,
-                "teacher_id": teacher_id,
-                "group_id": group_id,
-            }
-        )
+    async def create_schedule(self, schedule: ScheduleRegisterSchema):
+        schedule_id = await self.schedules_repo.create_one(dict(schedule))
         return schedule_id

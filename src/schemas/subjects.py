@@ -8,3 +8,9 @@ class SubjectSchema(BaseModel):
     
     class Config:
         from_attributes = True
+
+class SubjectRegisterSchema(BaseModel):
+    name: str
+    
+    class Config:
+        from_attributes = True

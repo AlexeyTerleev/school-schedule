@@ -7,3 +7,9 @@ class CitySchema(BaseModel):
 
     class Config:
         from_attributes = True
+
+class CityRegisterSchema(BaseModel):
+    name: str
+
+    class Config:
+        from_attributes = True

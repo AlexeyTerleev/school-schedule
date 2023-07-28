@@ -1,4 +1,5 @@
 from src.utils.repository import AbstractRepository
+from src.schemas.cities import CityRegisterSchema
 
 
 class CitiesService:
@@ -9,9 +10,7 @@ class CitiesService:
         cities = await self.cities_repo.find_all({})
         return cities
     
-    async def create_city(self, city_name: str):
-        city_id = await self.cities_repo.create_one(
-            {"name": city_name}
-        )
+    async def create_city(self, city: CityRegisterSchema):
+        city_id = await self.cities_repo.create_one(dict(city))
         return city_id
 

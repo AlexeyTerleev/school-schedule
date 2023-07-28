@@ -1,9 +1,11 @@
-from typing import Annotated
+from typing import Annotated, List
 
 from fastapi import APIRouter, Depends
 
 from src.api.dependencies import cities_service
 from src.services.cities import CitiesService
+from src.schemas.cities import CitySchema
+
 
 router = APIRouter(
     prefix="/cities",
@@ -11,7 +13,7 @@ router = APIRouter(
 )
 
 
-@router.get("")
+@router.get("", response_model=List[CitySchema])
 async def get_cities(
     cities_service: Annotated[CitiesService, Depends(cities_service)],
 ):

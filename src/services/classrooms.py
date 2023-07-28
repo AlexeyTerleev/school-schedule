@@ -1,4 +1,5 @@
 from src.utils.repository import AbstractRepository
+from src.schemas.classrooms import ClassroomRegisterSchema
 
 
 class ClassroomsService:
@@ -9,8 +10,6 @@ class ClassroomsService:
         classrooms = await self.classrooms_repo.find_all({"school_id": school_id})
         return classrooms
     
-    async def create_classroom(self, classroom_name: str, school_id: int):
-        classroom_id = await self.classrooms_repo.create_one(
-            {"name": classroom_name, "school_id": school_id}
-        )
+    async def create_classroom(self, classroom: ClassroomRegisterSchema):
+        classroom_id = await self.classrooms_repo.create_one(dict(classroom))
         return classroom_id

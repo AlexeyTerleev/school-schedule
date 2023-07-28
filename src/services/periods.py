@@ -1,5 +1,5 @@
 from src.utils.repository import AbstractRepository
-from datetime import time
+from src.schemas.periods import PeriodRegisterSchema
 
 
 class PeriodsService:
@@ -10,8 +10,6 @@ class PeriodsService:
         periods = await self.periods_repo.find_all({})
         return periods
     
-    async def create_period(self, start_time: time, end_time: time):
-        period_id = await self.periods_repo.create_one(
-            {"start_time": start_time, "end_time": end_time}
-        )
+    async def create_period(self, period: PeriodRegisterSchema):
+        period_id = await self.periods_repo.create_one(dict(period))
         return period_id

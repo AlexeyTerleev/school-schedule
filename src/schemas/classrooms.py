@@ -8,3 +8,11 @@ class ClassroomSchema(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class ClassroomRegisterSchema(BaseModel):
+    school_id: int
+    name: str
+
+    class Config:
+        from_attributes = True

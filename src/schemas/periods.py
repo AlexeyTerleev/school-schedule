@@ -9,3 +9,11 @@ class PeriodSchema(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class PeriodRegisterSchema(BaseModel):
+    start_time: time
+    end_time: time
+
+    class Config:
+        from_attributes = True
