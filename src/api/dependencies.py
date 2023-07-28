@@ -71,7 +71,7 @@ async def get_current_admin(
             headers={"WWW-Authenticate": "Bearer"},
         )
     try:
-        admin = admins_service.get_admin(token_data.sub)
+        admin = await admins_service.get_admin(token_data.sub)
     except ValueError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

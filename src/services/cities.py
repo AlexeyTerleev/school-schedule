@@ -8,3 +8,10 @@ class CitiesService:
     async def get_cities(self):
         cities = await self.cities_repo.find_all({})
         return cities
+    
+    async def create_city(self, city_name: str):
+        city_id = await self.cities_repo.create_one(
+            {"name": city_name}
+        )
+        return city_id
+

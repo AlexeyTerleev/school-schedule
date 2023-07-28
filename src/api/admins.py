@@ -1,11 +1,14 @@
-from typing import Annotated
+from typing import Annotated, Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from starlette import status    
 
-from src.api.dependencies import admins_service, get_current_admin
+from src.api.dependencies import admins_service, cities_service, schools_service, get_current_admin
 from src.services.admins import AdminsService
+
+from src.services.cities import CitiesService
+from src.services.schools import SchoolsService
 
 from src.schemas.admins import TokenSchema, AdminSchema
 
@@ -46,8 +49,47 @@ async def tmp(password):
     return {"hashed_password" : get_hashed_password(password)}
 #TMP ------------
 
-@router.post("/test")
-async def create_user(
-    admin: AdminSchema = Depends(get_current_admin)
+@router.post("/register/admin")
+async def create_admin(
+    login: str,
+    password: str,
+    permission: int,
+    school_id: Optional[int],
+    admins_service: Annotated[AdminsService, Depends(admins_service)],
+    admin: Annotated[AdminSchema, Depends(get_current_admin)],
     ):
-    return {'status': 'good'}
+    if admin.permission != 1:
+        raise PermissionError
+    if permission != 1 and school_id is None:
+        raise ValueError
+    admin_id = await admins_service.create_admin(login, password, permission, school_id)
+    return admin_id
+
+@router.post("/register/city")
+async def register_city(
+    city_name: str,
+    cities_service: Annotated[CitiesService, Depends(cities_service)],
+    admin: Annotated[AdminSchema, Depends(get_current_admin)],
+    ):
+    if admin.permission != 1:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Permission denied"
+        )
+    city_id = await cities_service.create_city(city_name)
+    return city_id
+
+@router.post("/register/school")
+async def register_school(
+    school_name: str,
+    city_id: int,
+    schools_service: Annotated[SchoolsService, Depends(schools_service)],
+    admin: Annotated[AdminSchema, Depends(get_current_admin)],
+    ):
+    if admin.permission != 1:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Permission denied"
+        )   
+    school_id = await schools_service.create_school(school_name, city_id)
+    return school_id
