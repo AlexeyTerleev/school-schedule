@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import time
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -10,8 +10,8 @@ class Periods(Base):
     __tablename__ = "periods"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    start_time: Mapped[datetime]
-    end_time: Mapped[datetime]
+    start_time: Mapped[time]
+    end_time: Mapped[time]
 
     def to_read_model(self) -> PeriodSchema:
         return PeriodSchema(
