@@ -13,16 +13,6 @@ sys.path.append(os.path.join(sys.path[0], 'src'))
 from src.config import DB_HOST, DB_PASS, DB_PORT, DB_USER, DB_NAME
 
 from src.db.db import Base
-from models.cities import Cities
-from models.classrooms import Classrooms
-from models.days import Days 
-from models.groups import Groups 
-from models.periods import Periods 
-from models.schedules import Schedules
-from models.schools import Schools
-from models.subjects import Subjects 
-from models.teachers import Teachers 
-from models.admins import Admins
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
