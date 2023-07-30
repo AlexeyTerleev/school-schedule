@@ -1,6 +1,7 @@
 from typing import Annotated, List
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
+from starlette import status
 
 from src.api.dependencies import teachers_service
 from src.services.teachers import TeachersService
@@ -18,5 +19,11 @@ async def get_teachers(
     school_id: int,
     teachers_service: Annotated[TeachersService, Depends(teachers_service)],
 ):
-    teachers = await teachers_service.get_teachers(school_id)
-    return teachers
+    try:
+        teachers = await teachers_service.get_teachers(school_id)
+        return teachers
+    except:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Something went wrong"
+        )

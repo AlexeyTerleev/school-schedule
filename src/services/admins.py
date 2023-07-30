@@ -21,4 +21,10 @@ class AdminsService:
             }
         )
         return admin
+    
+    async def delete_admin(self, login: str):
+        admin = await self.admins_repo.delete(
+            {"login": login}
+        )
+        return admin
 

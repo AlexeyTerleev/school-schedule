@@ -1,6 +1,7 @@
 from typing import Annotated, List
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
+from starlette import status
 
 from src.api.dependencies import periods_service
 from src.services.periods import PeriodsService
@@ -16,5 +17,11 @@ router = APIRouter(
 async def get_periods(
     periods_service: Annotated[PeriodsService, Depends(periods_service)],
 ):
-    periods = await periods_service.get_periods()
-    return periods
+    try:
+        periods = await periods_service.get_periods()
+        return periods
+    except:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Something went wrong"
+        )
